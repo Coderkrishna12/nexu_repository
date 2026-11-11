@@ -2,7 +2,6 @@ import 'package:uuid/uuid.dart';
 
 import '../models/command_intent.dart';
 import '../models/command_result.dart';
-import '../models/confidence_level.dart';
 import '../models/conversation_state.dart';
 import '../models/parsed_command.dart';
 import '../models/task_item.dart';
