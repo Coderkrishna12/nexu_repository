@@ -1,11 +1,6 @@
 import 'task_item.dart';
 
-enum UndoActionType {
-  added,
-  completed,
-  rescheduled,
-  deleted,
-}
+enum UndoActionType { added, completed, rescheduled, deleted }
 
 class UndoAction {
   final UndoActionType type;
@@ -44,4 +39,3 @@ class UndoAction {
     );
   }
 }
-

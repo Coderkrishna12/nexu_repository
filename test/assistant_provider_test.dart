@@ -37,12 +37,17 @@ void main() {
     });
 
     test('Adding task persists to storage and records in history', () async {
-      await provider.submitCommand('add task buy cable tomorrow at 5 pm high priority');
+      await provider.submitCommand(
+        'add task buy cable tomorrow at 5 pm high priority',
+      );
 
       expect(provider.tasks.length, equals(1));
       expect(provider.tasks.first.title, equals('buy cable'));
       expect(provider.history.length, equals(1));
-      expect(provider.history.first.userSpokenText, equals('add task buy cable tomorrow at 5 pm high priority'));
+      expect(
+        provider.history.first.userSpokenText,
+        equals('add task buy cable tomorrow at 5 pm high priority'),
+      );
       expect(provider.undoStack.length, equals(1));
 
       // Reloading from storage retains tasks and history
@@ -58,13 +63,19 @@ void main() {
       // 9:00 AM default time has passed on 10:00 AM demo clock
       await provider.submitCommand('add task call vendor');
 
-      expect(provider.conversationState.status, equals(ConversationStatus.awaitingPastTimeConfirmation));
+      expect(
+        provider.conversationState.status,
+        equals(ConversationStatus.awaitingPastTimeConfirmation),
+      );
       expect(provider.tasks.isEmpty, isTrue);
 
       // Confirm via tap
       await provider.confirmPastTimeByTap(true);
 
-      expect(provider.conversationState.status, equals(ConversationStatus.idle));
+      expect(
+        provider.conversationState.status,
+        equals(ConversationStatus.idle),
+      );
       expect(provider.tasks.length, equals(1));
       expect(provider.tasks.first.title, equals('call vendor'));
       // Moved to 12 Nov, 9:00 AM
@@ -72,7 +83,9 @@ void main() {
     });
 
     test('Multi-turn C5 Delete confirmation flow via tap and undo', () async {
-      await provider.submitCommand('add task buy cable tomorrow at 5 pm high priority');
+      await provider.submitCommand(
+        'add task buy cable tomorrow at 5 pm high priority',
+      );
       expect(provider.tasks.length, equals(1));
 
       await provider.submitCommand('delete the last task');
@@ -95,7 +108,9 @@ void main() {
       await provider.toggleMute();
       expect(provider.isMuted, isTrue);
 
-      await provider.submitCommand('add task buy cable tomorrow at 5 pm high priority');
+      await provider.submitCommand(
+        'add task buy cable tomorrow at 5 pm high priority',
+      );
       expect(provider.tasks.length, equals(1));
       expect(storage.loadMute(), isTrue);
     });
@@ -110,4 +125,3 @@ void main() {
     });
   });
 }
-

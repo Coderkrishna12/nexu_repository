@@ -1,62 +1,70 @@
 import 'package:flutter/material.dart';
 
+/// Design tokens and Material 3 theme configuration for NEXU VoiceDesk.
+/// Crafted for high contrast, clean hierarchy, and glove-friendly touch targets.
 class AppTheme {
-  // Industrial High-Contrast Color Palette
-  static const primaryNavy = Color(0xFF0F172A);
+  static const primarySlate = Color(0xFF0F172A);
+  static const primaryDark = Color(0xFF1E293B);
   static const accentBlue = Color(0xFF2563EB);
-  static const accentBlueLight = Color(0xFF3B82F6);
-  static const surfaceDark = Color(0xFF1E293B);
-  static const cardBackground = Color(0xFFF8FAFC);
-  static const backgroundLight = Color(0xFFF1F5F9);
-  
-  // Status & Priority Colors
-  static const highPriorityRed = Color(0xFFDC2626);
-  static const mediumPriorityAmber = Color(0xFFD97706);
-  static const lowPriorityGreen = Color(0xFF16A34A);
-  static const infoTeal = Color(0xFF0D9488);
+  static const surfaceWhite = Colors.white;
+  static const backgroundMuted = Color(0xFFF8FAFC);
+  static const borderSubtle = Color(0xFFE2E8F0);
+  static const borderMedium = Color(0xFFCBD5E1);
+
+  static const textPrimary = Color(0xFF0F172A);
+  static const textSecondary = Color(0xFF475569);
+  static const textMuted = Color(0xFF64748B);
+  static const textSubtle = Color(0xFF94A3B8);
+  static const textTertiary = Color(0xFF94A3B8);
+
+  static const successEmerald = Color(0xFF10B981);
+  static const successBg = Color(0xFFDCFCE7);
+  static const successText = Color(0xFF15803D);
+
+  static const warningAmber = Color(0xFFF59E0B);
+  static const warningBg = Color(0xFFFEF3C7);
+  static const warningText = Color(0xFFB45309);
+
+  static const dangerRose = Color(0xFFEF4444);
+  static const dangerBg = Color(0xFFFEE2E2);
+  static const dangerText = Color(0xFFB91C1C);
 
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
         seedColor: accentBlue,
-        primary: accentBlue,
-        secondary: accentBlueLight,
-        surface: Colors.white,
+        primary: primarySlate,
+        secondary: accentBlue,
+        surface: surfaceWhite,
       ),
-      scaffoldBackgroundColor: backgroundLight,
+      scaffoldBackgroundColor: backgroundMuted,
       appBarTheme: const AppBarTheme(
-        backgroundColor: primaryNavy,
-        foregroundColor: Colors.white,
+        backgroundColor: surfaceWhite,
+        foregroundColor: textPrimary,
         elevation: 0,
+        scrolledUnderElevation: 0.5,
         centerTitle: false,
         titleTextStyle: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-          letterSpacing: 0.5,
+          fontSize: 17,
+          fontWeight: FontWeight.w700,
+          color: textPrimary,
+          letterSpacing: -0.3,
         ),
       ),
       cardTheme: CardThemeData(
-        color: Colors.white,
-        elevation: 1.5,
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        color: surfaceWhite,
+        elevation: 0,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: borderSubtle, width: 0.8),
         ),
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-      ),
-      chipTheme: ChipThemeData(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      dividerTheme: const DividerThemeData(
+        color: borderSubtle,
+        thickness: 0.8,
+        space: 1,
       ),
     );
   }

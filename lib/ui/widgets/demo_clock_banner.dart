@@ -12,85 +12,60 @@ class DemoClockBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<AssistantProvider>();
     final clockStr = DateTimeParser.formatFullDateTime(provider.demoClock);
-    final isDefault = provider.demoClock == AssistantProvider.defaultDemoClock;
 
     return Semantics(
-      label: 'Demo Clock Banner. Active demo time is $clockStr.',
+      label: 'Demo Reference Clock: $clockStr',
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        decoration: const BoxDecoration(
+          color: Color(0xFFF8FAFC),
           border: Border(
-            bottom: BorderSide(
-              color: isDefault ? const Color(0xFF3B82F6) : const Color(0xFFF59E0B),
-              width: 2,
-            ),
+            bottom: BorderSide(color: Color(0xFFE2E8F0), width: 0.8),
           ),
         ),
         child: Row(
           children: [
-            Icon(
-              Icons.schedule,
-              color: isDefault ? const Color(0xFF60A5FA) : const Color(0xFFFBBF24),
-              size: 20,
+            const Icon(Icons.schedule, size: 14, color: Color(0xFF64748B)),
+            const SizedBox(width: 8),
+            const Text(
+              'DEMO CLOCK',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF64748B),
+                letterSpacing: 0.5,
+              ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'DEMO CLOCK',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.1,
-                        ),
-                      ),
-                      if (isDefault) ...[
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2563EB),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            'ASSESSMENT DEFAULT',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  Text(
-                    clockStr,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+              child: Text(
+                clockStr,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF334155),
+                ),
               ),
             ),
-            IconButton(
-              tooltip: 'Adjust Demo Clock',
-              icon: const Icon(Icons.edit_calendar, color: Colors.white, size: 20),
-              onPressed: () {
+            InkWell(
+              borderRadius: BorderRadius.circular(4),
+              onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const SettingsScreen()),
                 );
               },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                child: Text(
+                  'Change',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF2563EB),
+                  ),
+                ),
+              ),
             ),
           ],
         ),

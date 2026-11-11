@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../core/theme/app_theme.dart';
 import '../../engine/date_time_parser.dart';
 import '../../models/task_item.dart';
@@ -24,167 +25,182 @@ class TaskCard extends StatelessWidget {
     final isDone = task.isCompleted;
 
     return Semantics(
-      label: 'Task: ${task.title}, priority ${task.priority.displayName}, due $dueFormatted, ${isDone ? "completed" : "pending"}',
+      label:
+          'Task: ${task.title}, priority ${task.priority.displayName}, due $dueFormatted, ${isDone ? "completed" : "pending"}',
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        duration: const Duration(milliseconds: 180),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
           color: isDone ? const Color(0xFFF8FAFC) : Colors.white,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isContextActive
-                ? const Color(0xFF2563EB)
-                : (isDone ? const Color(0xFFE2E8F0) : const Color(0xFFCBD5E1)),
-            width: isContextActive ? 2.5 : 1.0,
+                ? AppTheme.accentBlue
+                : AppTheme.borderSubtle,
+            width: isContextActive ? 1.4 : 0.8,
           ),
           boxShadow: [
             if (isContextActive)
               BoxShadow(
-                color: const Color(0xFF2563EB).withValues(alpha: 0.18),
-                blurRadius: 10,
-                offset: const Offset(0, 3),
+                color: AppTheme.accentBlue.withValues(alpha: 0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               )
             else
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 4,
-                offset: const Offset(0, 2),
+                offset: const Offset(0, 1),
               ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Context Header Pill (Rule C3)
-              if (isContextActive) ...[
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: const Color(0xFF3B82F6)),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onToggleDone,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Minimal Circular Checkbox with glove-friendly hit area
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isDone
+                        ? AppTheme.successEmerald
+                        : Colors.transparent,
+                    border: Border.all(
+                      color: isDone
+                          ? AppTheme.successEmerald
+                          : const Color(0xFF94A3B8),
+                      width: 1.8,
+                    ),
+                  ),
+                  child: isDone
+                      ? const Icon(Icons.check, size: 15, color: Colors.white)
+                      : null,
+                ),
+                const SizedBox(width: 12),
+
+                // Main Content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Context tag (if this is the last referenced task for pronoun commands)
+                      if (isContextActive)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Row(
+                            children: const [
+                              Icon(
+                                Icons.gps_fixed,
+                                size: 10,
+                                color: AppTheme.accentBlue,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'Active context item',
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.accentBlue,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      // Title
+                      Text(
+                        task.title,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: isDone
+                              ? AppTheme.textSubtle
+                              : AppTheme.textPrimary,
+                          decoration: isDone
+                              ? TextDecoration.lineThrough
+                              : null,
+                          decorationColor: AppTheme.textSubtle,
+                        ),
                       ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
+                      const SizedBox(height: 4),
+
+                      // Metadata: Due Date & Priority
+                      Row(
                         children: [
-                          Icon(Icons.gps_fixed, size: 12, color: Color(0xFF1D4ED8)),
-                          SizedBox(width: 4),
+                          Icon(
+                            Icons.calendar_today_outlined,
+                            size: 12,
+                            color: isDone
+                                ? const Color(0xFFCBD5E1)
+                                : AppTheme.textMuted,
+                          ),
+                          const SizedBox(width: 4),
                           Text(
-                            'ACTIVE CONTEXT ("it" / "that")',
+                            dueFormatted,
                             style: TextStyle(
-                              color: Color(0xFF1D4ED8),
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
+                              fontSize: 12,
+                              color: isDone
+                                  ? AppTheme.textSubtle
+                                  : AppTheme.textMuted,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
+                          const SizedBox(width: 8),
+                          _buildPriorityTag(task.priority, isDone),
                         ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 8),
-              ],
 
-              // Title and Status
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Status Icon (Tappable for glove convenience)
-                  Semantics(
-                    label: isDone ? 'Mark task as pending' : 'Mark task as done',
-                    button: true,
-                    child: InkWell(
-                      onTap: onToggleDone,
-                      borderRadius: BorderRadius.circular(20),
-                      child: Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: Icon(
-                          isDone ? Icons.check_circle : Icons.radio_button_unchecked,
-                          color: isDone ? const Color(0xFF16A34A) : Colors.grey,
-                          size: 26,
-                        ),
-                      ),
+                // Delete Button (Quiet & responsive)
+                if (onDelete != null)
+                  IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      size: 18,
+                      color: AppTheme.textSubtle,
                     ),
+                    tooltip: 'Delete task',
+                    splashRadius: 20,
+                    onPressed: onDelete,
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          task.title,
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: isDone ? const Color(0xFF64748B) : const Color(0xFF0F172A),
-                            decoration: isDone ? TextDecoration.lineThrough : null,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const Icon(Icons.access_time, size: 15, color: Color(0xFF64748B)),
-                            const SizedBox(width: 5),
-                            Text(
-                              dueFormatted,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: isDone ? const Color(0xFF94A3B8) : const Color(0xFF475569),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Priority Badge
-                  _buildPriorityBadge(task.priority),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildPriorityBadge(TaskPriority priority) {
-    Color bg;
-    Color fg;
-    switch (priority) {
-      case TaskPriority.high:
-        bg = const Color(0xFFFEE2E2);
-        fg = AppTheme.highPriorityRed;
-        break;
-      case TaskPriority.normal:
-        bg = const Color(0xFFDBEAFE);
-        fg = AppTheme.accentBlue;
-        break;
-      case TaskPriority.low:
-        bg = const Color(0xFFDCFCE7);
-        fg = AppTheme.lowPriorityGreen;
-        break;
+  Widget _buildPriorityTag(TaskPriority priority, bool isDone) {
+    if (priority == TaskPriority.normal) {
+      return const SizedBox.shrink();
     }
 
+    final isHigh = priority == TaskPriority.high;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
       decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(8),
+        color: isDone
+            ? const Color(0xFFF1F5F9)
+            : (isHigh ? AppTheme.dangerBg : const Color(0xFFF1F5F9)),
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         priority.displayName.toUpperCase(),
         style: TextStyle(
-          color: fg,
-          fontSize: 11,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0.5,
+          fontSize: 9.5,
+          fontWeight: FontWeight.w700,
+          color: isDone
+              ? AppTheme.textSubtle
+              : (isHigh ? AppTheme.dangerText : AppTheme.textSecondary),
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../../providers/assistant_provider.dart';
 import '../widgets/active_prompt_banner.dart';
 import '../widgets/demo_clock_banner.dart';
@@ -20,54 +21,77 @@ class HomeScreen extends StatelessWidget {
     final undoCount = provider.undoStack.length;
 
     return Scaffold(
+      backgroundColor: AppTheme.backgroundMuted,
       appBar: AppBar(
-        title: const Column(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0.5,
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('NEXU VoiceDesk'),
+          children: const [
             Text(
-              'Technician Hands-Free Assistant',
-              style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8), fontWeight: FontWeight.normal),
+              'NEXU VoiceDesk',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textPrimary,
+                letterSpacing: -0.3,
+              ),
+            ),
+            Text(
+              'Hands-Free Task Assistant',
+              style: TextStyle(
+                fontSize: 11,
+                color: AppTheme.textMuted,
+                fontWeight: FontWeight.normal,
+              ),
             ),
           ],
         ),
         actions: [
           // Undo Quick Button (Rule C7)
-          Semantics(
-            label: 'Undo last action. $undoCount actions available.',
-            button: true,
-            child: IconButton(
-              tooltip: 'Undo That',
-              icon: Badge(
-                isLabelVisible: undoCount > 0,
-                label: Text('$undoCount'),
-                child: const Icon(Icons.undo),
+          IconButton(
+            tooltip: 'Undo That',
+            icon: Badge(
+              isLabelVisible: undoCount > 0,
+              backgroundColor: AppTheme.primarySlate,
+              label: Text('$undoCount', style: const TextStyle(fontSize: 10)),
+              child: const Icon(
+                Icons.undo,
+                size: 20,
+                color: AppTheme.textSecondary,
               ),
-              onPressed: () => provider.submitCommand('undo that'),
             ),
+            onPressed: () => provider.submitCommand('undo that'),
           ),
-          // Mute Toggle (Section 3C)
-          Semantics(
-            label: provider.isMuted ? 'Unmute spoken replies' : 'Mute spoken replies',
-            button: true,
-            child: IconButton(
-              tooltip: provider.isMuted ? 'Unmute TTS' : 'Mute TTS',
-              icon: Icon(provider.isMuted ? Icons.volume_off : Icons.volume_up),
-              onPressed: () => provider.toggleMute(),
+          // Mute Audio Toggle (Section 3C)
+          IconButton(
+            tooltip: provider.isMuted
+                ? 'Unmute Speech Feedback'
+                : 'Mute Speech Feedback',
+            icon: Icon(
+              provider.isMuted ? Icons.volume_off : Icons.volume_up_outlined,
+              size: 20,
+              color: AppTheme.textSecondary,
             ),
+            onPressed: () => provider.toggleMute(),
           ),
-          // Settings Menu
+          // More Menu
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(
+              Icons.more_vert,
+              size: 20,
+              color: AppTheme.textSecondary,
+            ),
             onSelected: (val) {
               if (val == 'settings') {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const SettingsScreen()),
                 );
               } else if (val == 'about') {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const AboutScreen()),
-                );
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => const AboutScreen()));
               }
             },
             itemBuilder: (ctx) => [
@@ -75,9 +99,9 @@ class HomeScreen extends StatelessWidget {
                 value: 'settings',
                 child: Row(
                   children: [
-                    Icon(Icons.tune, size: 18),
-                    SizedBox(width: 8),
-                    Text('Settings & Clock'),
+                    Icon(Icons.tune, size: 16, color: AppTheme.textSecondary),
+                    SizedBox(width: 10),
+                    Text('Settings & Clock', style: TextStyle(fontSize: 13)),
                   ],
                 ),
               ),
@@ -85,9 +109,16 @@ class HomeScreen extends StatelessWidget {
                 value: 'about',
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline, size: 18),
-                    SizedBox(width: 8),
-                    Text('About NEXU'),
+                    Icon(
+                      Icons.info_outline,
+                      size: 16,
+                      color: AppTheme.textSecondary,
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      'About & Architecture',
+                      style: TextStyle(fontSize: 13),
+                    ),
                   ],
                 ),
               ),
@@ -98,7 +129,7 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Top Persistent Demo Clock Header
+            // Top Persistent Demo Reference Clock Banner
             const DemoClockBanner(),
 
             // Scrollable Content
@@ -106,17 +137,17 @@ class HomeScreen extends StatelessWidget {
               child: Stack(
                 children: [
                   SingleChildScrollView(
-                    padding: const EdgeInsets.only(bottom: 110),
+                    padding: const EdgeInsets.only(bottom: 96),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: const [
-                        // Active Conversational Clarification / Confirmation Prompt
+                        // Active Conversational Confirmation Banner (C2, C4, C5)
                         ActivePromptBanner(),
 
                         // Understanding Panel (Rule C6 & Section 3E)
                         UnderstandingPanel(),
 
-                        SizedBox(height: 8),
+                        SizedBox(height: 4),
 
                         // Task List (Section 3F)
                         TaskListView(),

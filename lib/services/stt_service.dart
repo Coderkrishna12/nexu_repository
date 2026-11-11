@@ -7,17 +7,12 @@ class SttService {
   bool _isListening = false;
   String _lastError = '';
   List<stt.LocaleName> _locales = [];
-  String? _preferredLocaleId;
+  String? preferredLocaleId;
 
   bool get isAvailable => _isAvailable;
   bool get isListening => _isListening;
   String get lastError => _lastError;
   List<stt.LocaleName> get locales => _locales;
-  String? get preferredLocaleId => _preferredLocaleId;
-
-  set preferredLocaleId(String? localeId) {
-    _preferredLocaleId = localeId;
-  }
 
   Future<bool> initialize({
     Function(String error)? onError,
@@ -49,12 +44,12 @@ class SttService {
           }).firstOrNull;
 
           if (enIn != null) {
-            _preferredLocaleId ??= enIn.localeId;
+            preferredLocaleId ??= enIn.localeId;
           } else {
             final sysLocale = await _speech.systemLocale();
-            _preferredLocaleId ??= sysLocale?.localeId;
+            preferredLocaleId ??= sysLocale?.localeId;
           }
-          debugPrint("STT initialized with preferred locale: $_preferredLocaleId");
+          debugPrint("STT initialized with preferred locale: $preferredLocaleId");
         } catch (localeErr) {
           debugPrint("STT locale detection note: $localeErr");
         }
@@ -76,7 +71,9 @@ class SttService {
     if (!_isAvailable) {
       final initialized = await initialize(onError: onError);
       if (!initialized) {
-        onError("Speech recognition unavailable or microphone permission denied.");
+        onError(
+          "Speech recognition unavailable or microphone permission denied.",
+        );
         return;
       }
     }
@@ -88,8 +85,8 @@ class SttService {
         onResult: (val) {
           onResult(val.recognizedWords, val.finalResult);
         },
-        localeId: _preferredLocaleId,
         listenOptions: stt.SpeechListenOptions(
+          localeId: preferredLocaleId,
           listenMode: stt.ListenMode.dictation,
           partialResults: true,
           cancelOnError: false,

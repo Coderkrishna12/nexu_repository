@@ -145,7 +145,8 @@ class CommandEngine {
     required DateTime demoClock,
   }) {
     // State 1: Past Time Confirmation (Rule C2)
-    if (conversationState.status == ConversationStatus.awaitingPastTimeConfirmation) {
+    if (conversationState.status ==
+        ConversationStatus.awaitingPastTimeConfirmation) {
       if (parsed.intent == CommandIntent.confirmYes) {
         final pending = conversationState.pendingTask;
         if (pending != null) {
@@ -197,8 +198,10 @@ class CommandEngine {
     }
 
     // State 2: Ambiguity Resolution (Rule C4)
-    if (conversationState.status == ConversationStatus.awaitingAmbiguityResolution) {
-      if (parsed.intent == CommandIntent.selectOption && parsed.targetIndex != null) {
+    if (conversationState.status ==
+        ConversationStatus.awaitingAmbiguityResolution) {
+      if (parsed.intent == CommandIntent.selectOption &&
+          parsed.targetIndex != null) {
         final index = parsed.targetIndex!;
         final candidateIds = conversationState.candidateTaskIds;
         if (index >= 0 && index < candidateIds.length) {
@@ -234,14 +237,17 @@ class CommandEngine {
             // Initiate C5 confirmation for chosen task
             return CommandResult(
               parsedCommand: parsed,
-              spokenResponse: "Are you sure you want to delete '${chosenTask.title}'?",
-              visualMessage: "Confirm deletion of '${chosenTask.title}' (voice or tap, 8s timeout)",
+              spokenResponse:
+                  "Are you sure you want to delete '${chosenTask.title}'?",
+              visualMessage:
+                  "Confirm deletion of '${chosenTask.title}' (voice or tap, 8s timeout)",
               updatedTasks: currentTasks,
               updatedConversationState: ConversationState(
                 status: ConversationStatus.awaitingDeleteConfirmation,
                 targetTaskId: chosenId,
                 awaitingSince: DateTime.now(),
-                questionPrompt: "Are you sure you want to delete '${chosenTask.title}'?",
+                questionPrompt:
+                    "Are you sure you want to delete '${chosenTask.title}'?",
               ),
               updatedUndoStack: undoStack,
               lastMentionedTaskId: chosenId,
@@ -254,15 +260,18 @@ class CommandEngine {
     }
 
     // State 3: Delete Confirmation (Rule C5)
-    if (conversationState.status == ConversationStatus.awaitingDeleteConfirmation) {
+    if (conversationState.status ==
+        ConversationStatus.awaitingDeleteConfirmation) {
       final targetId = conversationState.targetTaskId;
       final targetTask = currentTasks.cast<TaskItem?>().firstWhere(
-            (t) => t?.id == targetId,
-            orElse: () => null,
-          );
+        (t) => t?.id == targetId,
+        orElse: () => null,
+      );
 
       if (parsed.intent == CommandIntent.confirmYes && targetTask != null) {
-        final updatedTasks = currentTasks.where((t) => t.id != targetId).toList();
+        final updatedTasks = currentTasks
+            .where((t) => t.id != targetId)
+            .toList();
         final undoItem = UndoAction(
           type: UndoActionType.deleted,
           description: "deleted '${targetTask.title}'",
@@ -298,7 +307,8 @@ class CommandEngine {
     // If state is not resolved by response, repeat prompt or fallback
     return CommandResult(
       parsedCommand: parsed,
-      spokenResponse: conversationState.questionPrompt ?? "Please answer the question.",
+      spokenResponse:
+          conversationState.questionPrompt ?? "Please answer the question.",
       visualMessage: conversationState.questionPrompt ?? "Awaiting answer.",
       updatedTasks: currentTasks,
       updatedConversationState: conversationState,
@@ -320,13 +330,21 @@ class CommandEngine {
     required DateTime demoClock,
   }) {
     final title = parsed.title?.trim() ?? 'Untitled Task';
-    final targetDate = parsed.targetDate ?? DateTime(demoClock.year, demoClock.month, demoClock.day);
+    final targetDate =
+        parsed.targetDate ??
+        DateTime(demoClock.year, demoClock.month, demoClock.day);
     final timeMinutes = parsed.targetTimeMinutes ?? (9 * 60);
     final priority = parsed.priority ?? TaskPriority.normal;
 
     final hour = timeMinutes ~/ 60;
     final minute = timeMinutes % 60;
-    final scheduledDue = DateTime(targetDate.year, targetDate.month, targetDate.day, hour, minute);
+    final scheduledDue = DateTime(
+      targetDate.year,
+      targetDate.month,
+      targetDate.day,
+      hour,
+      minute,
+    );
 
     final newTask = TaskItem(
       id: _uuid.v4(),
@@ -368,8 +386,10 @@ class CommandEngine {
     final newUndoStack = _pushUndo(undoStack, undoItem);
 
     final dateStr = DateTimeParser.formatFullDateTime(scheduledDue);
-    final spokenResponse = "Added '$title', due $dateStr, ${priority.displayName} priority.";
-    final visualMsg = "Task added: '$title' (${priority.displayName}), Due: $dateStr.";
+    final spokenResponse =
+        "Added '$title', due $dateStr, ${priority.displayName} priority.";
+    final visualMsg =
+        "Task added: '$title' (${priority.displayName}), Due: $dateStr.";
 
     return CommandResult(
       parsedCommand: parsed,
@@ -395,7 +415,11 @@ class CommandEngine {
     required DateTime demoClock,
   }) {
     final query = parsed.targetQuery?.toLowerCase().trim() ?? '';
-    final resolved = _resolveTargetTasks(query, currentTasks, lastMentionedTaskId);
+    final resolved = _resolveTargetTasks(
+      query,
+      currentTasks,
+      lastMentionedTaskId,
+    );
 
     if (resolved.isContextMissing) {
       const msg = "Which task do you want to complete?";
@@ -486,7 +510,11 @@ class CommandEngine {
     required DateTime demoClock,
   }) {
     final query = parsed.targetQuery?.toLowerCase().trim() ?? '';
-    final resolved = _resolveTargetTasks(query, currentTasks, lastMentionedTaskId);
+    final resolved = _resolveTargetTasks(
+      query,
+      currentTasks,
+      lastMentionedTaskId,
+    );
 
     if (resolved.isContextMissing) {
       const msg = "Which task do you want to move?";
@@ -538,12 +566,22 @@ class CommandEngine {
     }
 
     final targetTask = resolved.matches.first;
-    final targetDate = parsed.targetDate ?? DateTime(demoClock.year, demoClock.month, demoClock.day);
-    final timeMinutes = parsed.targetTimeMinutes ?? (targetTask.dueDateTime.hour * 60 + targetTask.dueDateTime.minute);
+    final targetDate =
+        parsed.targetDate ??
+        DateTime(demoClock.year, demoClock.month, demoClock.day);
+    final timeMinutes =
+        parsed.targetTimeMinutes ??
+        (targetTask.dueDateTime.hour * 60 + targetTask.dueDateTime.minute);
 
     final hour = timeMinutes ~/ 60;
     final minute = timeMinutes % 60;
-    final newDueDateTime = DateTime(targetDate.year, targetDate.month, targetDate.day, hour, minute);
+    final newDueDateTime = DateTime(
+      targetDate.year,
+      targetDate.month,
+      targetDate.day,
+      hour,
+      minute,
+    );
 
     // Rule C2: Past Time check on reschedule
     if (newDueDateTime.isBefore(demoClock)) {
@@ -568,7 +606,9 @@ class CommandEngine {
     }
 
     final updatedTasks = currentTasks.map((t) {
-      return t.id == targetTask.id ? t.copyWith(dueDateTime: newDueDateTime) : t;
+      return t.id == targetTask.id
+          ? t.copyWith(dueDateTime: newDueDateTime)
+          : t;
     }).toList();
 
     final undoItem = UndoAction(
@@ -606,7 +646,11 @@ class CommandEngine {
     required DateTime demoClock,
   }) {
     final query = parsed.targetQuery?.toLowerCase().trim() ?? '';
-    final resolved = _resolveTargetTasks(query, currentTasks, lastMentionedTaskId);
+    final resolved = _resolveTargetTasks(
+      query,
+      currentTasks,
+      lastMentionedTaskId,
+    );
 
     if (resolved.isContextMissing) {
       const msg = "Which task do you want to delete?";
@@ -725,11 +769,14 @@ class CommandEngine {
     final count = matchingTasks.length;
     final taskWord = count == 1 ? "task" : "tasks";
     final titles = matchingTasks.map((t) => t.title).join(", ");
-    final spokenResponse = "You have $count $taskWord due $dateFormatted: $titles.";
+    final spokenResponse =
+        "You have $count $taskWord due $dateFormatted: $titles.";
     final visualMsg = "Tasks due $dateFormatted ($count): $titles.";
 
     // If there's only 1 task or last listed, set as context
-    final newContextId = matchingTasks.isNotEmpty ? matchingTasks.last.id : lastMentionedTaskId;
+    final newContextId = matchingTasks.isNotEmpty
+        ? matchingTasks.last.id
+        : lastMentionedTaskId;
 
     return CommandResult(
       parsedCommand: parsed,
@@ -784,7 +831,9 @@ class CommandEngine {
         // Undo COMPLETE -> Restore previous isCompleted status
         updatedTasks = updatedTasks.map((t) {
           return t.id == actionToUndo.task.id
-              ? t.copyWith(isCompleted: actionToUndo.previousIsCompleted ?? false)
+              ? t.copyWith(
+                  isCompleted: actionToUndo.previousIsCompleted ?? false,
+                )
               : t;
         }).toList();
         newContextId = actionToUndo.task.id;
@@ -830,12 +879,16 @@ class CommandEngine {
     List<TaskItem> tasks,
     String? lastMentionedTaskId,
   ) {
-    if (query == 'it' || query == 'that' || query == 'the last task' || query == 'last task' || query == 'this') {
+    if (query == 'it' ||
+        query == 'that' ||
+        query == 'the last task' ||
+        query == 'last task' ||
+        query == 'this') {
       if (lastMentionedTaskId != null) {
         final task = tasks.cast<TaskItem?>().firstWhere(
-              (t) => t?.id == lastMentionedTaskId,
-              orElse: () => null,
-            );
+          (t) => t?.id == lastMentionedTaskId,
+          orElse: () => null,
+        );
         if (task != null) {
           return _ResolvedTasks(matches: [task]);
         }
@@ -848,7 +901,9 @@ class CommandEngine {
     }
 
     // Otherwise, match against task titles (case-insensitive substring)
-    final matches = tasks.where((t) => t.title.toLowerCase().contains(query)).toList();
+    final matches = tasks
+        .where((t) => t.title.toLowerCase().contains(query))
+        .toList();
     return _ResolvedTasks(matches: matches);
   }
 
@@ -865,8 +920,5 @@ class _ResolvedTasks {
   final List<TaskItem> matches;
   final bool isContextMissing;
 
-  const _ResolvedTasks({
-    required this.matches,
-    this.isContextMissing = false,
-  });
+  const _ResolvedTasks({required this.matches, this.isContextMissing = false});
 }

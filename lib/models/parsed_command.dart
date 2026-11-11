@@ -10,7 +10,8 @@ class ParsedCommand {
   final DateTime? targetDate;
   final int? targetTimeMinutes; // Minutes from midnight (e.g. 540 for 9:00 AM)
   final TaskPriority? priority;
-  final String? targetQuery; // e.g. "it", "that", "the last task", "call", "buy cable"
+  final String?
+  targetQuery; // e.g. "it", "that", "the last task", "call", "buy cable"
   final int? targetIndex; // e.g. 0 for "one"/"first", 1 for "two"/"second"
   final bool usedDefaults;
   final List<String> matchedTokens;
@@ -51,4 +52,3 @@ class ParsedCommand {
     };
   }
 }
-

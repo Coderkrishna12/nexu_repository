@@ -32,7 +32,9 @@ class StorageService {
     if (raw == null || raw.isEmpty) return [];
     try {
       final list = jsonDecode(raw) as List<dynamic>;
-      return list.map((item) => TaskItem.fromJson(item as Map<String, dynamic>)).toList();
+      return list
+          .map((item) => TaskItem.fromJson(item as Map<String, dynamic>))
+          .toList();
     } catch (_) {
       return [];
     }
@@ -49,7 +51,11 @@ class StorageService {
     if (raw == null || raw.isEmpty) return [];
     try {
       final list = jsonDecode(raw) as List<dynamic>;
-      return list.map((item) => ParsedCommandLog.fromJson(item as Map<String, dynamic>)).toList();
+      return list
+          .map(
+            (item) => ParsedCommandLog.fromJson(item as Map<String, dynamic>),
+          )
+          .toList();
     } catch (_) {
       return [];
     }
@@ -90,7 +96,9 @@ class StorageService {
     if (raw == null || raw.isEmpty) return [];
     try {
       final list = jsonDecode(raw) as List<dynamic>;
-      return list.map((item) => UndoAction.fromJson(item as Map<String, dynamic>)).toList();
+      return list
+          .map((item) => UndoAction.fromJson(item as Map<String, dynamic>))
+          .toList();
     } catch (_) {
       return [];
     }
@@ -100,4 +108,3 @@ class StorageService {
     await _prefs.clear();
   }
 }
-

@@ -48,7 +48,10 @@ void main() {
     final textField = find.byType(TextField);
     expect(textField, findsOneWidget);
 
-    await tester.enterText(textField, 'add task buy cable tomorrow at 5 pm high priority');
+    await tester.enterText(
+      textField,
+      'add task buy cable tomorrow at 5 pm high priority',
+    );
     await tester.tap(find.text('Send'));
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));

@@ -16,44 +16,40 @@ class _SimulatedVoiceInputState extends State<SimulatedVoiceInput> {
 
   static const List<Map<String, String>> _acceptancePresets = [
     {
-      'num': '1',
-      'label': 'Add buy cable (High)',
+      'label': '1: Buy cable (High)',
       'cmd': 'add task buy cable tomorrow at 5 pm high priority',
     },
     {
-      'num': '2',
-      'label': 'Add call vendor (C2 Past)',
+      'label': '2: Call vendor (C2)',
       'cmd': 'add task call vendor',
     },
     {
-      'num': '3',
-      'label': 'Move it to Friday at 10',
+      'label': '3: Move to Friday at 10',
       'cmd': 'move it to Friday at 10',
     },
     {
-      'num': '4',
-      'label': 'Mark call done (C4 Ambiguity)',
+      'label': '4: Mark call done (C4)',
       'cmd': 'mark call done',
     },
     {
-      'num': '5',
-      'label': 'Delete the last task (C5)',
+      'label': '5: Delete last task (C5)',
       'cmd': 'delete the last task',
     },
     {
-      'num': '6',
-      'label': 'What is due today',
+      'label': '6: What is due today',
       'cmd': 'what is due today',
     },
     {
-      'num': '7',
-      'label': 'Undo that (C7)',
+      'label': '7: Undo that (C7)',
       'cmd': 'undo that',
     },
     {
-      'num': '8',
-      'label': 'Make coffee... (C6 Low)',
+      'label': '8: Coffee test (C6 Low)',
       'cmd': 'make coffee fly to the moon',
+    },
+    {
+      'label': 'Call done (Shorthand)',
+      'cmd': 'call done',
     },
   ];
 
@@ -74,140 +70,118 @@ class _SimulatedVoiceInputState extends State<SimulatedVoiceInput> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+      decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(
-          top: BorderSide(color: Colors.grey.shade300, width: 1),
+          top: BorderSide(color: Color(0xFFE2E8F0), width: 0.8),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 6,
-            offset: const Offset(0, -2),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Section Label & Quick Examples Bar
+          // Minimal Header & Presets
           Row(
-            children: [
-              Icon(Icons.keyboard_outlined, size: 16, color: Colors.blue.shade800),
-              const SizedBox(width: 6),
-              const Text(
+            children: const [
+              Text(
                 'SIMULATED VOICE (TYPED INPUT)',
                 style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
-                  color: Color(0xFF1E293B),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF64748B),
+                  letterSpacing: 0.5,
                 ),
               ),
-              const Spacer(),
-              const Text(
-                'Section 5 Presets:',
-                style: TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+              Spacer(),
+              Text(
+                'Section 5 Presets',
+                style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8)),
               ),
             ],
           ),
           const SizedBox(height: 6),
 
-          // Horizontal scroll of Section 5 acceptance chips
+          // Presets Scroll
           SizedBox(
-            height: 32,
+            height: 26,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: _acceptancePresets.length,
               separatorBuilder: (_, index) => const SizedBox(width: 6),
               itemBuilder: (context, idx) {
                 final preset = _acceptancePresets[idx];
-                return ActionChip(
-                  backgroundColor: const Color(0xFFF1F5F9),
-                  side: BorderSide(color: Colors.grey.shade300),
-                  padding: EdgeInsets.zero,
-                  labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-                  avatar: CircleAvatar(
-                    radius: 8,
-                    backgroundColor: const Color(0xFF2563EB),
-                    child: Text(
-                      preset['num']!,
-                      style: const TextStyle(fontSize: 9, color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  label: Text(
-                    preset['label']!,
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-                  ),
-                  onPressed: () {
+                return InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {
                     _controller.text = preset['cmd']!;
                     _submit();
                   },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      preset['label']!,
+                      style: const TextStyle(
+                        fontSize: 10.5,
+                        color: Color(0xFF475569),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                 );
               },
             ),
           ),
+          const SizedBox(height: 8),
 
-          const SizedBox(height: 10),
-
-          // Input Row
+          // Clean Input Row
           Row(
             children: [
               Expanded(
-                child: Semantics(
-                  label: 'Simulated voice text box. Enter command here.',
-                  textField: true,
-                  child: TextField(
-                    controller: _controller,
-                    focusNode: _focusNode,
-                    textInputAction: TextInputAction.send,
-                    onSubmitted: (_) => _submit(),
-                    style: const TextStyle(fontSize: 15),
-                    decoration: InputDecoration(
-                      hintText: 'Type sentence (e.g. "add task buy cable tomorrow at 5 pm")...',
-                      hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade500),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      filled: true,
-                      fillColor: const Color(0xFFF8FAFC),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFF2563EB), width: 1.5),
-                      ),
+                child: TextField(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
+                  decoration: InputDecoration(
+                    hintText: 'Type command or tap preset above...',
+                    hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    isDense: true,
+                    filled: true,
+                    fillColor: const Color(0xFFF8FAFC),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 0.8),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 0.8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      borderSide: const BorderSide(color: Color(0xFF0F172A), width: 1.0),
                     ),
                   ),
+                  onSubmitted: (_) => _submit(),
                 ),
               ),
               const SizedBox(width: 8),
-              Semantics(
-                label: 'Send simulated voice command',
-                button: true,
-                child: ElevatedButton(
-                  onPressed: _submit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0F172A),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.send, size: 18),
-                      SizedBox(width: 4),
-                      Text('Send', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0F172A),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                  textStyle: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
                 ),
+                onPressed: _submit,
+                child: const Text('Send'),
               ),
             ],
           ),

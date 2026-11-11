@@ -61,10 +61,9 @@ class TtsService {
         await Future.delayed(const Duration(milliseconds: 60));
       }
       _isSpeaking = true;
-      await _flutterTts.speak(text).timeout(
-            const Duration(seconds: 1),
-            onTimeout: () => 1,
-          );
+      await _flutterTts
+          .speak(text)
+          .timeout(const Duration(seconds: 1), onTimeout: () => 1);
     } catch (e) {
       _isSpeaking = false;
       debugPrint("TTS speak failed: $e");
@@ -76,9 +75,9 @@ class TtsService {
     try {
       _isSpeaking = false;
       await _flutterTts.stop().timeout(
-            const Duration(milliseconds: 400),
-            onTimeout: () => 1,
-          );
+        const Duration(milliseconds: 400),
+        onTimeout: () => 1,
+      );
     } catch (e) {
       debugPrint("TTS stop error: $e");
     }

@@ -43,9 +43,9 @@ class AssistantProvider extends ChangeNotifier {
     required StorageService storage,
     required TtsService ttsService,
     required SttService sttService,
-  })  : _storage = storage,
-        _ttsService = ttsService,
-        _sttService = sttService {
+  }) : _storage = storage,
+       _ttsService = ttsService,
+       _sttService = sttService {
     _loadFromStorage();
   }
 
@@ -62,7 +62,8 @@ class AssistantProvider extends ChangeNotifier {
   String? get micErrorMessage => _micErrorMessage;
   int get deleteCountdownSeconds => _deleteCountdownSeconds;
   bool get isAwaitingDeleteConfirmation =>
-      _conversationState.status == ConversationStatus.awaitingDeleteConfirmation;
+      _conversationState.status ==
+      ConversationStatus.awaitingDeleteConfirmation;
   String? get sttLocale => _sttService.preferredLocaleId;
   List<dynamic> get sttLocales => _sttService.locales;
 
@@ -120,7 +121,8 @@ class AssistantProvider extends ChangeNotifier {
     _history = [logEntry, ..._history];
 
     // If waiting for delete confirmation (Rule C5), start 8s countdown
-    if (_conversationState.status == ConversationStatus.awaitingDeleteConfirmation) {
+    if (_conversationState.status ==
+        ConversationStatus.awaitingDeleteConfirmation) {
       _startDeleteCountdown();
     }
 
@@ -188,7 +190,9 @@ class AssistantProvider extends ChangeNotifier {
 
   Future<void> selectAmbiguityOptionByTap(int index) async {
     final optionWords = ["one", "two", "three"];
-    final word = index < optionWords.length ? optionWords[index] : "${index + 1}";
+    final word = index < optionWords.length
+        ? optionWords[index]
+        : "${index + 1}";
     await submitCommand(word);
   }
 

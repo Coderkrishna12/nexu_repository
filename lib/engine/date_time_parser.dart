@@ -1,6 +1,7 @@
 class ParsedDateTimeResult {
   final DateTime? date; // Date component (year, month, day)
-  final int? timeMinutes; // Minutes from midnight (e.g. 5:00 PM -> 1020, 9:00 AM -> 540)
+  final int?
+  timeMinutes; // Minutes from midnight (e.g. 5:00 PM -> 1020, 9:00 AM -> 540)
   final bool hasExplicitDate;
   final bool hasExplicitTime;
   final List<String> matchedTokens;
@@ -38,18 +39,30 @@ class DateTimeParser {
   };
 
   static const Map<String, int> _monthMap = {
-    'january': 1, 'jan': 1,
-    'february': 2, 'feb': 2,
-    'march': 3, 'mar': 3,
-    'april': 4, 'apr': 4,
+    'january': 1,
+    'jan': 1,
+    'february': 2,
+    'feb': 2,
+    'march': 3,
+    'mar': 3,
+    'april': 4,
+    'apr': 4,
     'may': 5,
-    'june': 6, 'jun': 6,
-    'july': 7, 'jul': 7,
-    'august': 8, 'aug': 8,
-    'september': 9, 'sep': 9, 'sept': 9,
-    'october': 10, 'oct': 10,
-    'november': 11, 'nov': 11,
-    'december': 12, 'dec': 12,
+    'june': 6,
+    'jun': 6,
+    'july': 7,
+    'jul': 7,
+    'august': 8,
+    'aug': 8,
+    'september': 9,
+    'sep': 9,
+    'sept': 9,
+    'october': 10,
+    'oct': 10,
+    'november': 11,
+    'nov': 11,
+    'december': 12,
+    'dec': 12,
   };
 
   /// Parses date and time from [input] relative to [demoClock].
@@ -101,7 +114,11 @@ class DateTimeParser {
             }
           }
           final calculated = demoClock.add(Duration(days: daysToAdd));
-          resolvedDate = DateTime(calculated.year, calculated.month, calculated.day);
+          resolvedDate = DateTime(
+            calculated.year,
+            calculated.month,
+            calculated.day,
+          );
           matchedTokens.add(match.group(0)!);
           text = text.replaceRange(match.start, match.end, ' ');
         }
@@ -118,7 +135,9 @@ class DateTimeParser {
       if (match1 != null) {
         final day = int.parse(match1.group(1)!);
         final month = _monthMap[match1.group(2)!.toLowerCase()]!;
-        final year = match1.group(3) != null ? int.parse(match1.group(3)!) : demoClock.year;
+        final year = match1.group(3) != null
+            ? int.parse(match1.group(3)!)
+            : demoClock.year;
         hasExplicitDate = true;
         resolvedDate = DateTime(year, month, day);
         matchedTokens.add(match1.group(0)!);
@@ -144,7 +163,9 @@ class DateTimeParser {
     if (amPmMatch != null) {
       hasExplicitTime = true;
       int hour = int.parse(amPmMatch.group(1)!);
-      final minute = amPmMatch.group(2) != null ? int.parse(amPmMatch.group(2)!) : 0;
+      final minute = amPmMatch.group(2) != null
+          ? int.parse(amPmMatch.group(2)!)
+          : 0;
       final meridian = amPmMatch.group(3)!.toLowerCase();
 
       if (meridian == 'pm' && hour < 12) {
@@ -161,7 +182,9 @@ class DateTimeParser {
       if (atMatch != null) {
         hasExplicitTime = true;
         int hour = int.parse(atMatch.group(1)!);
-        final minute = atMatch.group(2) != null ? int.parse(atMatch.group(2)!) : 0;
+        final minute = atMatch.group(2) != null
+            ? int.parse(atMatch.group(2)!)
+            : 0;
 
         // Technician schedule heuristic:
         // 7, 8, 9, 10, 11 -> AM (e.g. "at 10" -> 10:00 AM)
@@ -194,8 +217,18 @@ class DateTimeParser {
   static String formatFullDateTime(DateTime dt) {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
 
     final dayName = days[dt.weekday - 1];
@@ -213,8 +246,18 @@ class DateTimeParser {
   static String formatDateOnly(DateTime dt) {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${days[dt.weekday - 1]} ${dt.day} ${months[dt.month - 1]}';
   }
@@ -237,4 +280,3 @@ class DateTimeParser {
     return '$hour12:$minuteStr $period';
   }
 }
-

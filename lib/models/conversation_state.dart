@@ -45,7 +45,8 @@ class ConversationState {
       status: status ?? this.status,
       questionPrompt: questionPrompt ?? this.questionPrompt,
       pendingTask: pendingTask ?? this.pendingTask,
-      proposedNewDueDateTime: proposedNewDueDateTime ?? this.proposedNewDueDateTime,
+      proposedNewDueDateTime:
+          proposedNewDueDateTime ?? this.proposedNewDueDateTime,
       candidateTaskIds: candidateTaskIds ?? this.candidateTaskIds,
       pendingIntent: pendingIntent ?? this.pendingIntent,
       targetTaskId: targetTaskId ?? this.targetTaskId,
@@ -55,4 +56,3 @@ class ConversationState {
 
   static const idle = ConversationState();
 }
-

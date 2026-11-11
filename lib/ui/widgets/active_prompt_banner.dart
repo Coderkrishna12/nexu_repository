@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../../models/conversation_state.dart';
 import '../../providers/assistant_provider.dart';
 
@@ -16,172 +17,215 @@ class ActivePromptBanner extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final isDelete =
+        state.status == ConversationStatus.awaitingDeleteConfirmation;
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFEF3C7),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF59E0B), width: 2),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDelete ? AppTheme.dangerRose : AppTheme.borderMedium,
+          width: 1.2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.amber.withValues(alpha: 0.15),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Prompt Title Row
+          // Header Row
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                width: 8,
+                height: 8,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF59E0B),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.help_outline, color: Colors.white, size: 24),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _getPromptLabel(state.status),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF92400E),
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      state.questionPrompt ?? 'Action required',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF78350F),
-                      ),
-                    ),
-                  ],
+                  shape: BoxShape.circle,
+                  color: isDelete ? AppTheme.dangerRose : AppTheme.accentBlue,
                 ),
               ),
-              if (state.status == ConversationStatus.awaitingDeleteConfirmation) ...[
-                // Rule C5: 8-second countdown badge
+              const SizedBox(width: 8),
+              Text(
+                _getPromptLabel(state.status).toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textSecondary,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const Spacer(),
+              if (isDelete) ...[
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFDC2626),
-                    borderRadius: BorderRadius.circular(20),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
                   ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.timer, color: Colors.white, size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${provider.deleteCountdownSeconds}s',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
+                  decoration: BoxDecoration(
+                    color: AppTheme.dangerBg,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Cancels in ${provider.deleteCountdownSeconds}s',
+                    style: const TextStyle(
+                      color: AppTheme.dangerText,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 11,
+                    ),
                   ),
                 ),
               ],
             ],
           ),
+          const SizedBox(height: 8),
 
-          const SizedBox(height: 14),
+          // Question Prompt
+          Text(
+            state.questionPrompt ?? 'Confirmation required',
+            style: const TextStyle(
+              fontSize: 14.5,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textPrimary,
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 12),
 
-          // Action Buttons based on status
-          if (state.status == ConversationStatus.awaitingPastTimeConfirmation) ...[
+          // Action Buttons
+          if (state.status ==
+              ConversationStatus.awaitingPastTimeConfirmation) ...[
             Row(
               children: [
                 Expanded(
-                  child: ElevatedButton.icon(
+                  child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF16A34A),
+                      backgroundColor: AppTheme.primarySlate,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                    icon: const Icon(Icons.check),
-                    label: const Text('Yes, Move to Tomorrow'),
                     onPressed: () => provider.confirmPastTimeByTap(true),
+                    child: const Text(
+                      'Yes, Move to Tomorrow',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: OutlinedButton.icon(
+                  child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF991B1B),
-                      side: const BorderSide(color: Color(0xFFDC2626)),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      foregroundColor: AppTheme.textSecondary,
+                      side: const BorderSide(color: AppTheme.borderMedium),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                    icon: const Icon(Icons.close),
-                    label: const Text('No, Cancel'),
                     onPressed: () => provider.confirmPastTimeByTap(false),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
-          ] else if (state.status == ConversationStatus.awaitingDeleteConfirmation) ...[
+          ] else if (isDelete) ...[
             Row(
               children: [
                 Expanded(
-                  child: ElevatedButton.icon(
+                  child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFDC2626),
+                      backgroundColor: AppTheme.dangerRose,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                    icon: const Icon(Icons.delete_forever),
-                    label: const Text('Yes, Delete'),
                     onPressed: () => provider.confirmDeleteByTap(true),
+                    child: const Text(
+                      'Yes, Delete',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: OutlinedButton.icon(
+                  child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.black87,
-                      side: const BorderSide(color: Colors.grey),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      foregroundColor: AppTheme.textSecondary,
+                      side: const BorderSide(color: AppTheme.borderMedium),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
-                    icon: const Icon(Icons.close),
-                    label: const Text('Cancel'),
                     onPressed: () => provider.confirmDeleteByTap(false),
+                    child: const Text(
+                      'Keep Task',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
-          ] else if (state.status == ConversationStatus.awaitingAmbiguityResolution) ...[
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+          ] else if (state.status ==
+              ConversationStatus.awaitingAmbiguityResolution) ...[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 for (int i = 0; i < state.candidateTaskIds.length; i++) ...[
-                  Builder(builder: (context) {
-                    final taskId = state.candidateTaskIds[i];
-                    final task = provider.tasks.firstWhere(
-                      (t) => t.id == taskId,
-                      orElse: () => provider.tasks.first,
-                    );
-                    return ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2563EB),
-                        foregroundColor: Colors.white,
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppTheme.textPrimary,
+                        side: const BorderSide(color: AppTheme.borderMedium),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 11,
+                          horizontal: 12,
+                        ),
+                        alignment: Alignment.centerLeft,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       onPressed: () => provider.selectAmbiguityOptionByTap(i),
-                      child: Text('${i + 1}: ${task.title}'),
-                    );
-                  }),
+                      child: Text(
+                        'Option ${i + 1}: ${_getTaskTitle(provider, state.candidateTaskIds[i])}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ],
             ),
@@ -194,13 +238,18 @@ class ActivePromptBanner extends StatelessWidget {
   String _getPromptLabel(ConversationStatus status) {
     switch (status) {
       case ConversationStatus.awaitingPastTimeConfirmation:
-        return 'RULE C2 • PAST TIME CLARIFICATION';
+        return 'Time has passed';
       case ConversationStatus.awaitingAmbiguityResolution:
-        return 'RULE C4 • AMBIGUOUS MATCH CLARIFICATION';
+        return 'Multiple matches found';
       case ConversationStatus.awaitingDeleteConfirmation:
-        return 'RULE C5 • DELETE SAFETY CONFIRMATION';
+        return 'Confirm deletion';
       case ConversationStatus.idle:
         return '';
     }
+  }
+
+  String _getTaskTitle(AssistantProvider provider, String id) {
+    final match = provider.tasks.where((t) => t.id == id).firstOrNull;
+    return match?.title ?? 'Task';
   }
 }

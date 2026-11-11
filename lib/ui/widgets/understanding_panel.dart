@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../../engine/date_time_parser.dart';
 import '../../models/confidence_level.dart';
 import '../../providers/assistant_provider.dart';
@@ -22,21 +23,25 @@ class _UnderstandingPanelState extends State<UnderstandingPanel> {
 
     if (history.isEmpty) {
       return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppTheme.borderSubtle, width: 0.8),
         ),
         child: Row(
-          children: [
-            Icon(Icons.psychology_outlined, color: Colors.blue.shade700, size: 28),
-            const SizedBox(width: 12),
-            const Expanded(
+          children: const [
+            Icon(Icons.mic_none, color: AppTheme.textSubtle, size: 16),
+            SizedBox(width: 10),
+            Expanded(
               child: Text(
-                'Understanding Panel ready. Speak or simulate a command to view parsed intent, values, and confidence.',
-                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                'Understanding Panel ready. Speak or enter a command below.',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  color: AppTheme.textMuted,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
             ),
           ],
@@ -47,43 +52,32 @@ class _UnderstandingPanelState extends State<UnderstandingPanel> {
     final latest = history.first;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFCBD5E1), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.borderSubtle, width: 0.8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: const BoxDecoration(
-              color: Color(0xFF0F172A),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(14),
-                topRight: Radius.circular(14),
-              ),
-            ),
+          // Header Bar: Icon, Label, and Confidence Badge
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 8),
             child: Row(
               children: [
-                const Icon(Icons.psychology, color: Color(0xFF60A5FA), size: 22),
+                const Icon(
+                  Icons.graphic_eq,
+                  size: 15,
+                  color: AppTheme.accentBlue,
+                ),
                 const SizedBox(width: 8),
                 const Text(
-                  'UNDERSTANDING PANEL',
+                  'Assistant Response',
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.8,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
                 const Spacer(),
@@ -91,264 +85,216 @@ class _UnderstandingPanelState extends State<UnderstandingPanel> {
               ],
             ),
           ),
+          const Divider(height: 1, color: Color(0xFFF1F5F9)),
 
-          // Latest Parsed Command Content
+          // Body: Spoken prompt & Visual confirmation
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // What User Said
-                const Text(
-                  'WHAT USER SAID:',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF64748B),
-                    letterSpacing: 0.5,
+                // User's spoken input
+                Text(
+                  '"${latest.userSpokenText}"',
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: Text(
-                    '"${latest.userSpokenText}"',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      fontStyle: FontStyle.italic,
-                      color: Color(0xFF0F172A),
-                    ),
-                  ),
-                ),
 
-                const SizedBox(height: 12),
-
-                // Extracted Intent & Values
-                const Text(
-                  'WHAT APP UNDERSTOOD:',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF64748B),
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 6,
-                  children: [
-                    _buildPill(
-                      label: 'Intent',
-                      value: latest.intent.displayName,
-                      color: const Color(0xFF2563EB),
-                    ),
-                    if (latest.extractedTitle != null)
-                      _buildPill(
-                        label: 'Title',
-                        value: latest.extractedTitle!,
-                        color: const Color(0xFF0F172A),
-                      ),
-                    if (latest.extractedDate != null)
-                      _buildPill(
-                        label: 'Date',
-                        value: DateTimeParser.formatDateOnly(latest.extractedDate!),
-                        color: const Color(0xFF0D9488),
-                      ),
-                    if (latest.extractedTimeMinutes != null)
-                      _buildPill(
-                        label: 'Time',
-                        value: _formatTimeMinutes(latest.extractedTimeMinutes!),
-                        color: const Color(0xFF0D9488),
-                      ),
-                    if (latest.extractedPriority != null)
-                      _buildPill(
-                        label: 'Priority',
-                        value: latest.extractedPriority!.displayName,
-                        color: const Color(0xFFD97706),
-                      ),
-                    if (latest.targetQuery != null)
-                      _buildPill(
-                        label: 'Target',
-                        value: latest.targetQuery!,
-                        color: const Color(0xFF7C3AED),
-                      ),
-                  ],
-                ),
-
-                const SizedBox(height: 12),
-
-                // Spoken / Visual Result
-                const Text(
-                  'RESULT & SPOKEN FEEDBACK:',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF64748B),
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 4),
+                // Spoken / Visual response message
                 Text(
                   latest.responseMessage,
                   style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF334155),
-                    fontWeight: FontWeight.w500,
+                    fontSize: 12.5,
+                    color: AppTheme.textSecondary,
+                    height: 1.35,
                   ),
                 ),
+
+                // Extracted parameters (clean, muted chips)
+                if (latest.extractedDate != null ||
+                    latest.extractedPriority != null) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      if (latest.extractedDate != null)
+                        _buildInfoTag(
+                          icon: Icons.calendar_today_outlined,
+                          text: latest.extractedTimeMinutes != null
+                              ? '${DateTimeParser.formatDateOnly(latest.extractedDate!)}, ${DateTimeParser.formatMinutesToTime(latest.extractedTimeMinutes!)}'
+                              : DateTimeParser.formatDateOnly(
+                                  latest.extractedDate!,
+                                ),
+                        ),
+                      if (latest.extractedPriority != null)
+                        _buildInfoTag(
+                          icon: Icons.flag_outlined,
+                          text: latest.extractedPriority!.displayName,
+                        ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
 
-          // History Expansion Header
+          // Collapsible Command History
           if (history.length > 1) ...[
-            const Divider(height: 1),
+            const Divider(height: 1, color: Color(0xFFF1F5F9)),
             InkWell(
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
               onTap: () {
                 setState(() {
                   _isHistoryExpanded = !_isHistoryExpanded;
                 });
               },
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 child: Row(
                   children: [
-                    Icon(
-                      _isHistoryExpanded ? Icons.expand_less : Icons.expand_more,
-                      size: 20,
-                      color: const Color(0xFF475569),
-                    ),
-                    const SizedBox(width: 6),
                     Text(
-                      'Past Command History (${history.length - 1} earlier turns)',
+                      '${history.length - 1} earlier ${history.length - 1 == 1 ? "command" : "commands"}',
                       style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF475569),
+                        fontSize: 11.5,
+                        color: AppTheme.textMuted,
+                        fontWeight: FontWeight.w500,
                       ),
+                    ),
+                    const Spacer(),
+                    Icon(
+                      _isHistoryExpanded
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      size: 15,
+                      color: AppTheme.textMuted,
                     ),
                   ],
                 ),
               ),
             ),
-            if (_isHistoryExpanded) ...[
-              Container(
-                constraints: const BoxConstraints(maxHeight: 280),
+            if (_isHistoryExpanded)
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 160),
                 child: ListView.separated(
                   shrinkWrap: true,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   itemCount: history.length - 1,
-                  separatorBuilder: (_, index) => const Divider(height: 1),
+                  separatorBuilder: (_, index) =>
+                      const Divider(height: 1, color: Color(0xFFF8FAFC)),
                   itemBuilder: (context, idx) {
                     final item = history[idx + 1];
-                    return ListTile(
-                      dense: true,
-                      title: Text(
-                        '"${item.userSpokenText}"',
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '"${item.userSpokenText}"',
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                color: AppTheme.textSecondary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildConfidenceBadge(item.confidence, mini: true),
+                        ],
                       ),
-                      subtitle: Text(
-                        '${item.intent.displayName} • ${item.responseMessage}',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      trailing: _buildConfidenceBadge(item.confidence, small: true),
                     );
                   },
                 ),
               ),
-            ],
           ],
         ],
       ),
     );
   }
 
-  Widget _buildConfidenceBadge(ConfidenceLevel confidence, {bool small = false}) {
+  Widget _buildConfidenceBadge(
+    ConfidenceLevel confidence, {
+    bool mini = false,
+  }) {
     Color bg;
     Color fg;
+    String text;
+
     switch (confidence) {
       case ConfidenceLevel.high:
-        bg = const Color(0xFF16A34A);
-        fg = Colors.white;
+        bg = AppTheme.successBg;
+        fg = AppTheme.successText;
+        text = 'CONFIDENCE HIGH';
         break;
       case ConfidenceLevel.medium:
-        bg = const Color(0xFFF59E0B);
-        fg = Colors.black87;
+        bg = AppTheme.warningBg;
+        fg = AppTheme.warningText;
+        text = 'CONFIDENCE MEDIUM';
         break;
       case ConfidenceLevel.low:
-        bg = const Color(0xFFDC2626);
-        fg = Colors.white;
+        bg = AppTheme.dangerBg;
+        fg = AppTheme.dangerText;
+        text = 'CONFIDENCE LOW';
         break;
     }
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: small ? 6 : 8,
-        vertical: small ? 2 : 4,
+        horizontal: mini ? 4 : 6,
+        vertical: mini ? 1 : 2,
       ),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        'CONFIDENCE ${confidence.displayName.toUpperCase()}',
+        text,
         style: TextStyle(
           color: fg,
-          fontSize: small ? 9 : 10,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 0.5,
+          fontSize: mini ? 8.5 : 9.5,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.3,
         ),
       ),
     );
   }
 
-  Widget _buildPill({
-    required String label,
-    required String value,
-    required Color color,
-  }) {
+  Widget _buildInfoTag({required IconData icon, required String text}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        color: const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(4),
       ),
-      child: RichText(
-        text: TextSpan(
-          text: '$label: ',
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-          children: [
-            TextSpan(
-              text: value,
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF0F172A),
-              ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: AppTheme.textMuted),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textSecondary,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
-  }
-
-  String _formatTimeMinutes(int minutes) {
-    final hour = minutes ~/ 60;
-    final minute = minutes % 60;
-    final hour12 = hour % 12 == 0 ? 12 : hour % 12;
-    final period = hour >= 12 ? 'PM' : 'AM';
-    final minuteStr = minute.toString().padLeft(2, '0');
-    return '$hour12:$minuteStr $period';
   }
 }
