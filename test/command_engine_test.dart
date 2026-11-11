@@ -270,5 +270,110 @@ void main() {
       expect(result.wasExecuted, isFalse);
       expect(result.spokenResponse, contains('rephrasing'));
     });
+
+    test('Edge case: Context missing when referring to "it" with no tasks', () {
+      final result = CommandEngine.processInput(
+        rawInput: 'move it to Friday at 10',
+        currentTasks: [],
+        conversationState: ConversationState.idle,
+        undoStack: [],
+        lastMentionedTaskId: null,
+        demoClock: demoClock,
+      );
+
+      expect(result.wasExecuted, isFalse);
+      expect(result.spokenResponse, contains('Which task do you want to move?'));
+    });
+
+    test('Edge case: Past time rejected with "no" cancels task creation', () {
+      final result = CommandEngine.processInput(
+        rawInput: 'add task call vendor',
+        currentTasks: [],
+        conversationState: ConversationState.idle,
+        undoStack: [],
+        lastMentionedTaskId: null,
+        demoClock: demoClock,
+      );
+
+      expect(result.requiresConfirmation, isTrue);
+
+      final cancelResult = CommandEngine.processInput(
+        rawInput: 'no',
+        currentTasks: result.updatedTasks,
+        conversationState: result.updatedConversationState,
+        undoStack: result.updatedUndoStack,
+        lastMentionedTaskId: result.lastMentionedTaskId,
+        demoClock: demoClock,
+      );
+
+      expect(cancelResult.wasExecuted, isFalse);
+      expect(cancelResult.updatedTasks.isEmpty, isTrue);
+      expect(cancelResult.spokenResponse, contains('Task cancelled'));
+    });
+
+    test('Edge case: Delete confirmation rejected with "no"', () {
+      final task = TaskItem(
+        id: 't-del-reject',
+        title: 'clean motor',
+        dueDateTime: DateTime(2026, 11, 12, 10, 0),
+      );
+
+      final result = CommandEngine.processInput(
+        rawInput: 'delete clean motor',
+        currentTasks: [task],
+        conversationState: ConversationState.idle,
+        undoStack: [],
+        lastMentionedTaskId: task.id,
+        demoClock: demoClock,
+      );
+
+      expect(result.requiresConfirmation, isTrue);
+
+      final cancelResult = CommandEngine.processInput(
+        rawInput: 'no',
+        currentTasks: result.updatedTasks,
+        conversationState: result.updatedConversationState,
+        undoStack: result.updatedUndoStack,
+        lastMentionedTaskId: result.lastMentionedTaskId,
+        demoClock: demoClock,
+      );
+
+      expect(cancelResult.wasExecuted, isFalse);
+      expect(cancelResult.updatedTasks.length, equals(1));
+      expect(cancelResult.spokenResponse, contains('Deletion cancelled'));
+    });
+
+    test('Edge case: Multi-step Undo sequence across complete and reschedule', () {
+      final task = TaskItem(
+        id: 't-seq',
+        title: 'fix pump',
+        dueDateTime: DateTime(2026, 11, 11, 15, 0),
+        isCompleted: false,
+      );
+
+      // 1. Complete task
+      final completeResult = CommandEngine.processInput(
+        rawInput: 'mark fix pump done',
+        currentTasks: [task],
+        conversationState: ConversationState.idle,
+        undoStack: [],
+        lastMentionedTaskId: task.id,
+        demoClock: demoClock,
+      );
+      expect(completeResult.updatedTasks.first.isCompleted, isTrue);
+      expect(completeResult.updatedUndoStack.length, equals(1));
+
+      // 2. Undo completion
+      final undoResult = CommandEngine.processInput(
+        rawInput: 'undo that',
+        currentTasks: completeResult.updatedTasks,
+        conversationState: ConversationState.idle,
+        undoStack: completeResult.updatedUndoStack,
+        lastMentionedTaskId: completeResult.lastMentionedTaskId,
+        demoClock: demoClock,
+      );
+      expect(undoResult.updatedTasks.first.isCompleted, isFalse);
+      expect(undoResult.spokenResponse, contains("Reversed: marked 'fix pump' done"));
+    });
   });
 }
