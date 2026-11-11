@@ -141,14 +141,18 @@ class TaskCard extends StatelessWidget {
                                 : AppTheme.textMuted,
                           ),
                           const SizedBox(width: 4),
-                          Text(
-                            dueFormatted,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isDone
-                                  ? AppTheme.textSubtle
-                                  : AppTheme.textMuted,
-                              fontWeight: FontWeight.w500,
+                          Flexible(
+                            child: Text(
+                              dueFormatted,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDone
+                                    ? AppTheme.textSubtle
+                                    : AppTheme.textMuted,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 8),

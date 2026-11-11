@@ -116,11 +116,14 @@ class ActivePromptBanner extends StatelessWidget {
                       ),
                     ),
                     onPressed: () => provider.confirmPastTimeByTap(true),
-                    child: const Text(
-                      'Yes, Move to Tomorrow',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
+                    child: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'Yes, Move to Tomorrow',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
                   ),
@@ -137,11 +140,14 @@ class ActivePromptBanner extends StatelessWidget {
                       ),
                     ),
                     onPressed: () => provider.confirmPastTimeByTap(false),
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
+                    child: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
                   ),
@@ -163,11 +169,14 @@ class ActivePromptBanner extends StatelessWidget {
                       ),
                     ),
                     onPressed: () => provider.confirmDeleteByTap(true),
-                    child: const Text(
-                      'Yes, Delete',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
+                    child: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'Yes, Delete',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
                   ),
@@ -184,11 +193,14 @@ class ActivePromptBanner extends StatelessWidget {
                       ),
                     ),
                     onPressed: () => provider.confirmDeleteByTap(false),
-                    child: const Text(
-                      'Keep Task',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
+                    child: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'Keep Task',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
                   ),

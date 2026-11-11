@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nexu_voicedesk/engine/command_engine.dart';
+import 'package:nexu_voicedesk/engine/fuzzy_matcher.dart';
 import 'package:nexu_voicedesk/models/command_intent.dart';
 import 'package:nexu_voicedesk/models/confidence_level.dart';
 import 'package:nexu_voicedesk/models/conversation_state.dart';
@@ -523,5 +524,44 @@ void main() {
         );
       },
     );
+
+    test('FuzzyMatcher: dynamic Levenshtein and acoustic phonetic matching', () {
+      // 1. Direct Damerau-Levenshtein distance (supports transpositions)
+      expect(FuzzyMatcher.levenshtein('task', 'taks'), equals(1));
+      expect(FuzzyMatcher.levenshtein('vendor', 'vender'), equals(1));
+      expect(FuzzyMatcher.levenshtein('cable', 'kabel'), equals(2));
+
+      // 2. Best match candidate selection
+      final candidates = ['task', 'vendor', 'priority', 'cable', 'tomorrow'];
+      expect(
+        FuzzyMatcher.findBestMatch('tast', candidates, maxDistance: 1),
+        equals('task'),
+      );
+      expect(
+        FuzzyMatcher.findBestMatch('vender', candidates, maxDistance: 1),
+        equals('vendor'),
+      );
+      expect(
+        FuzzyMatcher.findBestMatch('venders', candidates, maxDistance: 2),
+        equals('vendor'),
+      );
+      expect(
+        FuzzyMatcher.findBestMatch('priorty', candidates, maxDistance: 1),
+        equals('priority'),
+      );
+
+      // 3. CommandEngine integration with fuzzy input: "add taks buy cable tomorrow"
+      final result = CommandEngine.processInput(
+        rawInput: 'add taks buy cable tomorrow at 5 pm',
+        currentTasks: [],
+        conversationState: ConversationState.idle,
+        undoStack: [],
+        lastMentionedTaskId: null,
+        demoClock: demoClock,
+      );
+      expect(result.intent, equals(CommandIntent.add));
+      expect(result.parsedCommand.title, equals('buy cable'));
+      expect(result.wasExecuted, isTrue);
+    });
   });
 }

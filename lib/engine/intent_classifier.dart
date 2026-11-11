@@ -4,6 +4,7 @@ import '../models/conversation_state.dart';
 import '../models/parsed_command.dart';
 import '../models/task_priority.dart';
 import 'date_time_parser.dart';
+import 'fuzzy_matcher.dart';
 
 class IntentClassifier {
   /// Known words in the NEXU VoiceDesk vocabulary (all lowercase, strictly unique)
@@ -179,6 +180,22 @@ class IntentClassifier {
     'pack', 'store', 'test', 'audit',
   };
 
+  static const List<String> _fuzzyCorrectionCandidates = [
+    'task',
+    'vendor',
+    'priority',
+    'reschedule',
+    'delete',
+    'tomorrow',
+    'undo',
+    'today',
+    'cable',
+    'complete',
+    'friday',
+    'minute',
+    'morning',
+  ];
+
   /// Preprocesses text to fix common speech recognition acoustic misrecognitions and typos
   static String _normalizeAcousticAndSttErrors(String text) {
     var s = text;
@@ -251,6 +268,24 @@ class IntentClassifier {
       RegExp(r'\b(?:fix\s+pup|fix\s+bump)\b', caseSensitive: false),
       'fix pump',
     );
+
+    // Dynamic token fuzzy correction using Levenshtein distance for unexpected acoustic slips
+    final tokens = s.split(' ');
+    final corrected = <String>[];
+    for (final token in tokens) {
+      final lower = token.toLowerCase();
+      if (lower.length >= 4 && !_knownVocabulary.contains(lower)) {
+        final match = FuzzyMatcher.findBestMatch(
+          lower,
+          _fuzzyCorrectionCandidates,
+          maxDistance: 1,
+        );
+        corrected.add(match ?? token);
+      } else {
+        corrected.add(token);
+      }
+    }
+    s = corrected.join(' ');
 
     // Collapse whitespace
     return s.replaceAll(RegExp(r'\s+'), ' ').trim();

@@ -49,7 +49,9 @@ class SttService {
             final sysLocale = await _speech.systemLocale();
             preferredLocaleId ??= sysLocale?.localeId;
           }
-          debugPrint("STT initialized with preferred locale: $preferredLocaleId");
+          debugPrint(
+            "STT initialized with preferred locale: $preferredLocaleId",
+          );
         } catch (localeErr) {
           debugPrint("STT locale detection note: $localeErr");
         }

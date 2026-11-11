@@ -72,12 +72,16 @@ class _UnderstandingPanelState extends State<UnderstandingPanel> {
                   color: AppTheme.accentBlue,
                 ),
                 const SizedBox(width: 8),
-                const Text(
-                  'Assistant Response',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
+                const Flexible(
+                  child: Text(
+                    'Assistant Response',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
                 ),
                 const Spacer(),

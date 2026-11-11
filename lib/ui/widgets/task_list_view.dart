@@ -51,11 +51,7 @@ class _TaskListViewState extends State<TaskListView> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           child: Row(
             children: [
-              _buildFilterPill(
-                title: 'All',
-                count: allTasks.length,
-                index: 0,
-              ),
+              _buildFilterPill(title: 'All', count: allTasks.length, index: 0),
               const SizedBox(width: 8),
               _buildFilterPill(
                 title: 'Today',
@@ -90,8 +86,8 @@ class _TaskListViewState extends State<TaskListView> {
                     _selectedFilterIndex == 1
                         ? 'No tasks due today'
                         : (_selectedFilterIndex == 2
-                            ? 'No completed tasks yet'
-                            : 'No tasks created yet'),
+                              ? 'No completed tasks yet'
+                              : 'No tasks created yet'),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
