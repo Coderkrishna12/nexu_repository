@@ -30,7 +30,7 @@ flutter run -d android
 ```
 
 #### Run Automated Test Suite
-To run all 19 automated tests (acceptance examples, edge cases, UI smoke, provider integration):
+To run all 20 automated tests (acceptance examples, edge cases, UI smoke, provider integration):
 ```bash
 flutter test
 ```
