@@ -226,4 +226,15 @@ class DateTimeParser {
     final period = dt.hour >= 12 ? 'PM' : 'AM';
     return '$hour12:$minuteStr $period';
   }
+
+  /// Formats minutes from midnight to a time string (e.g. 540 -> "9:00 AM", 1020 -> "5:00 PM")
+  static String formatMinutesToTime(int minutes) {
+    final hour = minutes ~/ 60;
+    final minute = minutes % 60;
+    final hour12 = hour % 12 == 0 ? 12 : hour % 12;
+    final minuteStr = minute.toString().padLeft(2, '0');
+    final period = hour >= 12 ? 'PM' : 'AM';
+    return '$hour12:$minuteStr $period';
+  }
 }
+

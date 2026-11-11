@@ -63,6 +63,13 @@ class AssistantProvider extends ChangeNotifier {
   int get deleteCountdownSeconds => _deleteCountdownSeconds;
   bool get isAwaitingDeleteConfirmation =>
       _conversationState.status == ConversationStatus.awaitingDeleteConfirmation;
+  String? get sttLocale => _sttService.preferredLocaleId;
+  List<dynamic> get sttLocales => _sttService.locales;
+
+  void setSttLocale(String localeId) {
+    _sttService.preferredLocaleId = localeId;
+    notifyListeners();
+  }
 
   void _loadFromStorage() {
     _tasks = _storage.loadTasks();
@@ -185,13 +192,16 @@ class AssistantProvider extends ChangeNotifier {
     await submitCommand(word);
   }
 
+  bool _isHoldingButton = false;
+
   // -------------------------------------------------------------
   // Voice Input (Hold-to-Talk)
   // -------------------------------------------------------------
-  Future<void> startListening() async {
+  Future<void> startListening({bool isHold = false}) async {
     // Interrupt TTS immediately
     await _ttsService.stop();
 
+    _isHoldingButton = isHold;
     _micErrorMessage = null;
     _liveTranscript = '';
     _isListening = true;
@@ -201,7 +211,8 @@ class AssistantProvider extends ChangeNotifier {
       onResult: (text, isFinal) {
         _liveTranscript = text;
         notifyListeners();
-        if (isFinal && text.trim().isNotEmpty) {
+        // If user tapped rather than held down, auto-stop on final recognition
+        if (!_isHoldingButton && isFinal && text.trim().isNotEmpty) {
           stopListening();
         }
       },
@@ -217,6 +228,8 @@ class AssistantProvider extends ChangeNotifier {
     if (!_isListening) return;
     _isListening = false;
     await _sttService.stopListening();
+    // Allow brief moment for STT engine to emit the final speech buffer
+    await Future.delayed(const Duration(milliseconds: 150));
     final captured = _liveTranscript.trim();
     notifyListeners();
 

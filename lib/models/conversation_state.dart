@@ -55,3 +55,4 @@ class ConversationState {
 
   static const idle = ConversationState();
 }
+

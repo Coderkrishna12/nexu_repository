@@ -146,6 +146,30 @@ void main() {
       expect(completedTask.isCompleted, isTrue);
       final uncompletedTask = answerResult.updatedTasks.firstWhere((t) => t.id == 'task-b');
       expect(uncompletedTask.isCompleted, isFalse);
+
+      // Verify "call done" (shorthand without "mark") triggers C4 Ambiguity
+      final shorthandResult = CommandEngine.processInput(
+        rawInput: 'call done',
+        currentTasks: [taskA, taskB],
+        conversationState: ConversationState.idle,
+        undoStack: [],
+        lastMentionedTaskId: null,
+        demoClock: demoClock,
+      );
+      expect(shorthandResult.intent, equals(CommandIntent.complete));
+      expect(shorthandResult.spokenResponse, equals('Which one?'));
+
+      // Verify acoustic slip "golden" maps to "call done" and triggers C4 Ambiguity
+      final acousticResult = CommandEngine.processInput(
+        rawInput: 'golden',
+        currentTasks: [taskA, taskB],
+        conversationState: ConversationState.idle,
+        undoStack: [],
+        lastMentionedTaskId: null,
+        demoClock: demoClock,
+      );
+      expect(acousticResult.intent, equals(CommandIntent.complete));
+      expect(acousticResult.spokenResponse, equals('Which one?'));
     });
 
     test('Example 5: delete the last task (Rule C5 safety confirmation)', () {
@@ -341,6 +365,80 @@ void main() {
       expect(cancelResult.wasExecuted, isFalse);
       expect(cancelResult.updatedTasks.length, equals(1));
       expect(cancelResult.spokenResponse, contains('Deletion cancelled'));
+    });
+
+    test('User input robustness: "add tas name call vendor" & "i said add task..."', () {
+      // 1. "add tas name call vendor" (STT phonetic fast speech)
+      final result1 = CommandEngine.processInput(
+        rawInput: 'add tas name call vendor',
+        currentTasks: [],
+        conversationState: ConversationState.idle,
+        undoStack: [],
+        lastMentionedTaskId: null,
+        demoClock: demoClock,
+      );
+      expect(result1.intent, equals(CommandIntent.add));
+      expect(result1.parsedCommand.title, equals('call vendor'));
+      expect(result1.requiresConfirmation, isTrue); // C2 past time triggered
+      expect(result1.spokenResponse, contains('That time has passed. Move it to tomorrow?'));
+
+      // 2. "i said add tas name call vendor" (Acoustic slip + Conversational repetition)
+      final result2 = CommandEngine.processInput(
+        rawInput: 'i said add tas name call vendor',
+        currentTasks: [],
+        conversationState: ConversationState.idle,
+        undoStack: [],
+        lastMentionedTaskId: null,
+        demoClock: demoClock,
+      );
+      expect(result2.intent, equals(CommandIntent.add));
+      expect(result2.parsedCommand.title, equals('call vendor'));
+      expect(result2.requiresConfirmation, isTrue); // C2 past time triggered
+      expect(result2.spokenResponse, contains('That time has passed. Move it to tomorrow?'));
+
+      // 3. "can you please delete buy cable" (Polite prefix)
+      final taskBuyCable = TaskItem(
+        id: 't-buy',
+        title: 'buy cable',
+        dueDateTime: DateTime(2026, 11, 12, 17, 0),
+      );
+      final result3 = CommandEngine.processInput(
+        rawInput: 'can you please delete buy cable',
+        currentTasks: [taskBuyCable],
+        conversationState: ConversationState.idle,
+        undoStack: [],
+        lastMentionedTaskId: taskBuyCable.id,
+        demoClock: demoClock,
+      );
+      expect(result3.intent, equals(CommandIntent.delete));
+      expect(result3.parsedCommand.targetQuery, equals('buy cable'));
+      expect(result3.requiresConfirmation, isTrue);
+
+      // 4. "done with buy cable" (Natural completion variation)
+      final result4 = CommandEngine.processInput(
+        rawInput: 'done with buy cable',
+        currentTasks: [taskBuyCable],
+        conversationState: ConversationState.idle,
+        undoStack: [],
+        lastMentionedTaskId: taskBuyCable.id,
+        demoClock: demoClock,
+      );
+      expect(result4.intent, equals(CommandIntent.complete));
+      expect(result4.parsedCommand.targetQuery, equals('buy cable'));
+      expect(result4.wasExecuted, isTrue);
+
+      // 5. New command superseding active confirmation
+      final freshResult = CommandEngine.processInput(
+        rawInput: 'add task buy cable tomorrow at 5 pm high priority',
+        currentTasks: [],
+        conversationState: result1.updatedConversationState, // was waiting for yes/no
+        undoStack: [],
+        lastMentionedTaskId: null,
+        demoClock: demoClock,
+      );
+      expect(freshResult.intent, equals(CommandIntent.add));
+      expect(freshResult.parsedCommand.title, equals('buy cable'));
+      expect(freshResult.wasExecuted, isTrue);
     });
 
     test('Edge case: Multi-step Undo sequence across complete and reschedule', () {

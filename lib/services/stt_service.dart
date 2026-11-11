@@ -6,10 +6,18 @@ class SttService {
   bool _isAvailable = false;
   bool _isListening = false;
   String _lastError = '';
+  List<stt.LocaleName> _locales = [];
+  String? _preferredLocaleId;
 
   bool get isAvailable => _isAvailable;
   bool get isListening => _isListening;
   String get lastError => _lastError;
+  List<stt.LocaleName> get locales => _locales;
+  String? get preferredLocaleId => _preferredLocaleId;
+
+  set preferredLocaleId(String? localeId) {
+    _preferredLocaleId = localeId;
+  }
 
   Future<bool> initialize({
     Function(String error)? onError,
@@ -30,6 +38,28 @@ class SttService {
           onStatusChanged?.call();
         },
       );
+
+      if (_isAvailable) {
+        try {
+          _locales = await _speech.locales();
+          // Detect en_IN (English - India) for Indian English accent recognition
+          final enIn = _locales.where((l) {
+            final id = l.localeId.toLowerCase().replaceAll('-', '_');
+            return id.startsWith('en_in');
+          }).firstOrNull;
+
+          if (enIn != null) {
+            _preferredLocaleId ??= enIn.localeId;
+          } else {
+            final sysLocale = await _speech.systemLocale();
+            _preferredLocaleId ??= sysLocale?.localeId;
+          }
+          debugPrint("STT initialized with preferred locale: $_preferredLocaleId");
+        } catch (localeErr) {
+          debugPrint("STT locale detection note: $localeErr");
+        }
+      }
+
       return _isAvailable;
     } catch (e) {
       _isAvailable = false;
@@ -58,10 +88,13 @@ class SttService {
         onResult: (val) {
           onResult(val.recognizedWords, val.finalResult);
         },
+        localeId: _preferredLocaleId,
         listenOptions: stt.SpeechListenOptions(
-          listenMode: stt.ListenMode.confirmation,
+          listenMode: stt.ListenMode.dictation,
           partialResults: true,
-          cancelOnError: true,
+          cancelOnError: false,
+          pauseFor: const Duration(seconds: 8),
+          listenFor: const Duration(seconds: 60),
         ),
       );
     } catch (e) {

@@ -30,6 +30,11 @@ class TtsService {
 
       _flutterTts.setErrorHandler((msg) {
         _isSpeaking = false;
+        // "interrupted" or "canceled" is expected normal behavior when speech is interrupted
+        final str = msg.toString().toLowerCase();
+        if (str.contains('interrupted') || str.contains('cancel')) {
+          return;
+        }
         debugPrint("TTS Error: $msg");
       });
 
@@ -50,12 +55,18 @@ class TtsService {
       if (!_isInitialized) {
         await init();
       }
-      await stop(); // Cut off any previous speech immediately
+      if (_isSpeaking) {
+        await stop();
+        // Brief pause to allow the native audio track to release
+        await Future.delayed(const Duration(milliseconds: 60));
+      }
+      _isSpeaking = true;
       await _flutterTts.speak(text).timeout(
-            const Duration(milliseconds: 800),
+            const Duration(seconds: 1),
             onTimeout: () => 1,
           );
     } catch (e) {
+      _isSpeaking = false;
       debugPrint("TTS speak failed: $e");
     }
   }
@@ -65,7 +76,7 @@ class TtsService {
     try {
       _isSpeaking = false;
       await _flutterTts.stop().timeout(
-            const Duration(milliseconds: 500),
+            const Duration(milliseconds: 400),
             onTimeout: () => 1,
           );
     } catch (e) {

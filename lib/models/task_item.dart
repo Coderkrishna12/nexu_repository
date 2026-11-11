@@ -86,3 +86,4 @@ class TaskItem {
       priority.hashCode ^
       isCompleted.hashCode;
 }
+

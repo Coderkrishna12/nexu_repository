@@ -35,14 +35,23 @@ class CommandEngine {
 
     // 2. Route based on active conversational state OR intent
     if (conversationState.isWaitingForInput) {
-      return _handleActiveStateResponse(
-        parsed: parsed,
-        currentTasks: currentTasks,
-        conversationState: conversationState,
-        undoStack: undoStack,
-        lastMentionedTaskId: lastMentionedTaskId,
-        demoClock: demoClock,
-      );
+      // If the user issues a fresh command (ADD, COMPLETE, RESCHEDULE, DELETE, LIST, UNDO),
+      // allow it to supersede/preempt the previous question rather than trapping the user in deadlock.
+      if (parsed.intent != CommandIntent.confirmYes &&
+          parsed.intent != CommandIntent.confirmNo &&
+          parsed.intent != CommandIntent.selectOption &&
+          parsed.intent != CommandIntent.unknown) {
+        conversationState = ConversationState.idle;
+      } else {
+        return _handleActiveStateResponse(
+          parsed: parsed,
+          currentTasks: currentTasks,
+          conversationState: conversationState,
+          undoStack: undoStack,
+          lastMentionedTaskId: lastMentionedTaskId,
+          demoClock: demoClock,
+        );
+      }
     }
 
     // 3. Handle standard intents

@@ -31,3 +31,4 @@ class CommandResult {
   CommandIntent get intent => parsedCommand.intent;
   ConfidenceLevel get confidence => parsedCommand.confidence;
 }
+
