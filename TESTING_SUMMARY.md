@@ -2,14 +2,14 @@
 
 ## 1. Test Suite Overview
 
-A total of **19 automated tests** were authored and executed across 3 test suites:
-- **`test/command_engine_test.dart`**: 12 pure unit tests verifying the Command Engine, Intent Classifier, DateTimeParser, and Rules C1–C7.
+A total of **21 automated tests** were authored and executed across 3 test suites:
+- **`test/command_engine_test.dart`**: 14 pure unit tests verifying the Command Engine, Intent Classifier, DateTimeParser, FuzzyMatcher, and Rules C1–C7.
 - **`test/widget_test.dart`**: 1 comprehensive UI integration test verifying screen rendering, component bindings, and simulated voice execution.
 - **`test/assistant_provider_test.dart`**: 6 provider integration tests validating persistence, multi-turn tap workflows, mute toggling, and demo clock adjustments.
 
-All **19 tests pass synchronously with 0 failures**:
+All **21 tests pass synchronously with 0 failures**:
 ```
-00:03 +19: All tests passed!
+00:06 +21: All tests passed!
 ```
 
 ---

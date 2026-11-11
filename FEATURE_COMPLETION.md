@@ -28,7 +28,7 @@
 | **F** | **Persistence** | **Complete** | Serializes tasks, history logs, undo stack, and demo clock into `SharedPreferences`. Fully survives app reboots. |
 | **G** | **Accessibility & Gloves Support** | **Complete** | Large 78x78 dp thumb button at bottom-right. Large text scaling support. Semantics on all interactive widgets. High contrast industrial theme. |
 | **8.8** | **About Screen** | **Complete** | Displays candidate name, date and time task was received (`11 November 2026, 14:02 IST`), architecture summary, and disclosures. |
-| **6** | **Automated Tests** | **Complete** | 19 tests (12 Command Engine + 1 Widget Smoke + 6 Provider Integration) covering 100% of Section 5 acceptance tests and edge cases. |
+| **6** | **Automated Tests** | **Complete** | 21 tests (14 Command Engine & FuzzyMatcher + 1 Widget Smoke + 6 Provider Integration) covering 100% of Section 5 acceptance tests and edge cases. |
 
 ### Summary
 - **Complete**: All functional requirements (A, B, C, D, E, F, G), rules C1–C7, acceptance examples 1–8, accessibility, and documentation.
